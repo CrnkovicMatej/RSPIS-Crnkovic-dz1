@@ -37,14 +37,24 @@ public class MaxVersionController {
     @GetMapping("/versions/max")
     public String getMaxVersion(@RequestParam("v1") String v1, @RequestParam("v2") String v2)
     {
-        // Parse provided version strings into Version objects
-        Version version1 = new Version(v1);
-        Version version2 = new Version(v2);
+        try {
+            // Parse provided version strings into Version objects
+            Version version1 = new Version(v1);
+            Version version2 = new Version(v2);
 
-        // Resolve the maximum version using the MaxVersionService
-        String maxVersion = maxService.resolveMaxString(version1, version2);
+            // Resolve the maximum version using the MaxVersionService
+            String maxVersion = maxService.resolveMaxString(version1, version2);
 
-        // Return the maximum version string as a response, followed by a newline character
-        return maxVersion + "\n";
+            // Return the maximum version string as a response, followed by a newline character
+            return maxVersion + "\n";
+        }
+        // currently we do not want to throw
+        catch (IllegalArgumentException ex) {
+            return null;
+        } catch (UnsupportedOperationException ex) {
+            return null;
+        } catch (RuntimeException ex) {
+            return null;
+        }
     }
 }

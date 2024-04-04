@@ -4,9 +4,11 @@ import com.example.CrnkovicHW1.api.model.Version;
 import com.example.CrnkovicHW1.service.MaxVersionService;
 import com.example.CrnkovicHW1.service.NextVersionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * The NextVersionController class handles HTTP requests related to retrieving the next version based on the provided version and type.
@@ -38,9 +40,19 @@ public class NextVersionController {
     @GetMapping("/versions/next")
     public String getNextVersion(@RequestParam("v") String v1, @RequestParam("type") String type)
     {
-        // Parse provided version string into a Version object, Resolve the next version using the NextVersionService
-        Version version = new Version(v1);
-        String nextVersion = nextService.resolveNextVersion(version, type);
-        return nextVersion + "\n";
+        try{
+            // Parse provided version string into a Version object, Resolve the next version using the NextVersionService
+            Version version = new Version(v1);
+            String nextVersion = nextService.resolveNextVersion(version, type);
+            return nextVersion + "\n";
+        }
+        // currently we do not want to throw
+        catch (IllegalArgumentException ex) {
+            return null;
+        } catch (UnsupportedOperationException ex) {
+            return null;
+        } catch (RuntimeException ex) {
+            return null;
+        }
     }
 }

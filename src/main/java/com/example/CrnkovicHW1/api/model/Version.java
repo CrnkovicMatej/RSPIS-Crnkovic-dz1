@@ -49,23 +49,28 @@ public class Version implements Comparable<Version>
     private void ResolveVersion()
     {
         String[] versionSplitted = this.fullVersion.split("\\.");
-        this.majorPart = Integer.parseInt(versionSplitted[0]);
-        this.minorPart = Integer.parseInt(versionSplitted[1]);
-        String patchString = versionSplitted[2];
+        try {
+            this.majorPart = Integer.parseInt(versionSplitted[0]);
+            this.minorPart = Integer.parseInt(versionSplitted[1]);
+            String patchString = versionSplitted[2];
 
-        Pattern pattern = Pattern.compile("\\d+");
-        Matcher matcher = pattern.matcher(patchString);
-        if (matcher.find()) {
-            this.patchPart = Integer.parseInt(matcher.group());
+            Pattern pattern = Pattern.compile("\\d+");
+            Matcher matcher = pattern.matcher(patchString);
+            if (matcher.find()) {
+                this.patchPart = Integer.parseInt(matcher.group());
+            } else {
+                this.patchPart = 0;
+            }
+            int dashIndex = patchString.indexOf('-');
+            if (dashIndex != -1 && dashIndex >= matcher.end()) {
+                this.hasPreRelease = true;
+                this.preRelease = patchString.substring(dashIndex + 1);
+            }
         }
-        else
-        {
-            this.patchPart = 0;
-        }
-        int dashIndex = patchString.indexOf('-');
-        if (dashIndex != -1 && dashIndex > matcher.end()) {
-            this.hasPreRelease = true;
-            this.preRelease = patchString.substring(dashIndex + 1);
+        catch (NumberFormatException ex) {
+            throw new RuntimeException("Invalid integer format", ex);
+        } catch (IndexOutOfBoundsException ex) {
+            throw new RuntimeException("Invalid version format", ex);
         }
         this.resolvedVersion = String.format("%d.%d.%d", majorPart, minorPart, patchPart);
     }
